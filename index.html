@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outils OSINT</title>
+    <style>
+        footer {
+    background-color: #000000; /* Couleur de fond du footer */
+    color: white; /* Couleur du texte */
+    text-align: center; /* Centre le texte */
+    padding: 10px 0; /* Espacement autour du texte */
+    position: relative; /* Position relative pour s'assurer qu'il ne soit pas en position fixe */
+    bottom: 0; /* Pour que le footer soit en bas de la page */
+    width: 100%; /* Prend toute la largeur */
+    margin-top: 20px; /* Ajoute un espacement au-dessus du footer */
+}
+body {
+    font-family: Arial, sans-serif;
+    background-color: #000000;
+    color: white;
+    margin: 0;
+    padding: 20px;
+    overflow-y: scroll; /* Permet de faire défiler la page verticalement */
+    scroll-behavior: smooth; /* Défilement fluide */
+}
+
+/* Ajoute un style pour la barre de défilement */
+::-webkit-scrollbar {
+    width: 8px; /* Largeur de la barre de défilement */
+}
+
+::-webkit-scrollbar-thumb {
+    background: #ffffff; /* Couleur de la poignée de défilement */
+    border-radius: 10px; /* Coins arrondis */
+}
+
+::-webkit-scrollbar-track {
+    background: #333; /* Couleur de la piste de défilement */
+    border-radius: 10px; /* Coins arrondis */
+}
+
+/* Style supplémentaire pour le conteneur principal */
+#mainContainer {
+    max-width: 1200px; /* Largeur maximale du conteneur */
+    margin: auto; /* Centre le conteneur */
+    padding: 20px; /* Espacement interne */
+    border-radius: 10px; /* Coins arrondis pour le conteneur */
+    background: rgba(20, 20, 20, 0.9); /* Fond semi-transparent */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* Ombre portée */
+}
+        h2 {
+            border-bottom: 2px solid #ffffff;
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+        #banner {
+            background: url('https://cdn.discordapp.com/attachments/1183425945856651264/1240760719130103828/tumblr_54f1aff2dae93dff54bb0814a33a5d50_daa6aae9_640_1.gif?ex=67248f37&is=67233db7&hm=8a3e911a8269cfa88ae1de81dcec9b89febf00170d517549b7058b2519f9a1ac&') center/cover no-repeat;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        #searchContainer {
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 600px;
+    text-align: center; /* Centre le conteneur */
+}
+#searchInput {
+    padding: 15px; /* Augmente le padding pour plus d'espace */
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 25px; /* Donne un aspect arrondi */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Ajoute une ombre */
+    transition: all 0.3s ease; /* Transition pour un effet de survol */
+}
+
+#searchInput:focus {
+    border-color: #5b9bd5; /* Couleur de bordure lors du focus */
+    box-shadow: 0 0 8px rgba(91, 155, 213, 0.5); /* Ombre lors du focus */
+    outline: none; /* Supprime l'outline par défaut */
+}
+
+/* Optionnel : Style pour un bouton de recherche si tu en as un */
+#searchButton {
+    padding: 10px 20px; /* Ajoute du padding */
+    border: none; /* Supprime la bordure */
+    border-radius: 25px; /* Style arrondi */
+    background: linear-gradient(90deg, #5b9bd5, #3c7cbb); /* Dégradé */
+    color: white; /* Couleur du texte */
+    cursor: pointer; /* Change le curseur en pointer */
+    transition: background 0.3s ease; /* Transition pour le survol */
+}
+
+#searchButton:hover {
+    background: linear-gradient(90deg, #3c7cbb, #5b9bd5); /* Inverse le dégradé au survol */
+}
+        .category {
+            margin-bottom: 40px;
+        }
+        .tool-card {
+            background-color: #080d11;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            transition: transform 0.2s;
+            flex: 1 0 30%; /* Ajustement de la largeur des cartes */
+            max-width: 300px; /* Largeur maximale pour les cartes */
+        }
+        .tool-card:hover {
+            transform: scale(1.05);
+        }
+        .tool-card h3 {
+            margin: 0;
+        }
+        .tool-card p {
+            margin: 5px 0;
+        }
+        .tool-card a {
+            display: inline-block; /* Changer le lien en un bloc */
+            background: linear-gradient(45deg, #000000, #161515); /* Dégradé du bouton */
+            color: #fff; /* Couleur du texte */
+            padding: 10px 15px; /* Espacement à l'intérieur du bouton */
+            border-radius: 5px; /* Coins arrondis */
+            text-decoration: none; /* Enlever le soulignement */
+            font-weight: bold; /* Gras */
+            transition: background-color 0.3s, transform 0.3s; /* Transition pour le survol */
+            margin-top: 10px; /* Espace au-dessus du bouton */
+        }
+        .tool-card a:hover {
+            background: linear-gradient(45deg, #1b1b1a, #292826); /* Dégradé du bouton au survol */
+            transform: scale(1.05); /* Légère augmentation de taille au survol */
+        }
+        .toolsContainer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: flex-start;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="banner">
+        <div id="searchContainer">
+            <input type="text" id="searchInput" placeholder="Rechercher un outil..." onkeyup="filterTools()">
+        </div>
+    </div>
+
+    <div id="toolsContainer" class="toolsContainer"></div>
+
+    <script>
+        // Liste des outils OSINT organisés par catégories
+        const categories = [
+            {
+                name: "Recherche d'informations sur les personnes",
+                tools: [
+                    {
+                        name: "Discord ID lookup",
+                        description: "Lookup une ID discord.",
+                        link: "https://discord.id/"
+                    },
+                    {
+                        name: "Have I Been Pwned",
+                        description: "Vérifie si votre email a été compromis.",
+                        link: "https://haveibeenpwned.com"
+                    },
+                    {
+                        name: "Pipl",
+                        description: "Moteur de recherche pour trouver des personnes.",
+                        link: "https://pipl.com"
+                    },
+                    {
+                        name: "Social Search",
+                        description: "Recherchez des informations publiques sur des réseaux sociaux.",
+                        link: "https://www.social-searcher.com"
+                    },
+                    {
+                        name: "Spokeo",
+                        description: "Recherche d'informations sur des personnes.",
+                        link: "https://www.spokeo.com"
+                    },
+                    {
+                        name: "ZabaSearch",
+                        description: "Un moteur de recherche pour les gens aux États-Unis.",
+                        link: "https://www.zabasearch.com"
+                    },
+                    {
+                        name: "FindPeopleFast",
+                        description: "Trouvez rapidement des informations sur les personnes.",
+                        link: "https://www.findpeoplefast.net"
+                    },
+                    {
+                        name: "PeopleFinder",
+                        description: "Recherchez des personnes et trouvez leurs coordonnées.",
+                        link: "https://www.peoplefinder.com"
+                    },
+                    {
+                        name: "Whitepages",
+                        description: "Recherche de personnes, numéros de téléphone et adresses.",
+                        link: "https://www.whitepages.com"
+                    }
+                ]
+            },
+            {
+                name: "Analyse de données",
+                tools: [
+                    {
+                        name: "Maltego",
+                        description: "Outil d'analyse de données qui permet de découvrir des relations entre des informations.",
+                        link: "https://www.paterva.com/web7/"
+                    },
+                    {
+                        name: "IntelX",
+                        description: "Un moteur de recherche OSINT pour l'analyse de données.",
+                        link: "https://intelx.io"
+                    },
+                    {
+                        name: "Spyse",
+                        description: "Moteur de recherche pour les données sur l'infrastructure Internet.",
+                        link: "https://spyse.com"
+                    },
+                    {
+                        name: "DataMiner",
+                        description: "Outil pour extraire des données de pages web.",
+                        link: "https://data-miner.io"
+                    },
+                    {
+                        name: "OSINT Framework",
+                        description: "Un cadre utile pour trouver des outils OSINT.",
+                        link: "https://osintframework.com"
+                    },
+                    {
+                        name: "Wayback Machine",
+                        description: "Accédez aux archives des pages web.",
+                        link: "https://archive.org/web/"
+                    }
+                ]
+            },
+            {
+                name: "Sécurité informatique",
+                tools: [
+                    {
+                        name: "VirusTotal",
+                        description: "Analyse des fichiers et URL pour détecter des virus.",
+                        link: "https://www.virustotal.com"
+                    },
+                    {
+                        name: "Shodan",
+                        description: "Recherche des appareils connectés à Internet.",
+                        link: "https://shodan.io"
+                    },
+                    {
+                        name: "Censys",
+                        description: "Explorez les données sur les hôtes Internet.",
+                        link: "https://censys.io"
+                    },
+                    {
+                        name: "Dehashed",
+                        description: "Service de recherche de fuites de données.",
+                        link: "https://www.dehashed.com"
+                    },
+                    {
+                        name: "URLScan",
+                        description: "Analyse des URL et fournit des informations sur les sites.",
+                        link: "https://urlscan.io"
+                    },
+                    {
+                        name: "Detectify",
+                        description: "Scanner de sécurité pour identifier les vulnérabilités.",
+                        link: "https://detectify.com"
+                    },
+                    {
+                        name: "Cybaze",
+                        description: "Surveillez les menaces en ligne et les fuites de données.",
+                        link: "https://www.cybaze.com"
+                    }
+                ]
+            },
+            {
+                name: "Géolocalisation et IP",
+                tools: [
+                    {
+                        name: "IPinfo",
+                        description: "Récupère des informations sur une adresse IP.",
+                        link: "https://ipinfo.io"
+                    },
+                    {
+                        name: "GeoIP",
+                        description: "Géolocalise une adresse IP.",
+                        link: "https://geoiptool.com"
+                    },
+                    {
+                        name: "IP Geolocation",
+                        description: "Trouve l'emplacement d'une adresse IP.",
+                        link: "https://ipgeolocation.io"
+                    },
+                    {
+                        name: "IP-API",
+                        description: "Obtenez des informations géographiques sur une adresse IP.",
+                        link: "http://ip-api.com"
+                    },
+                    {
+                        name: "WhatIsMyIP",
+                        description: "Affichez des informations sur votre adresse IP.",
+                        link: "https://www.whatismyip.com"
+                    },
+                    {
+                        name: "GeoTracker",
+                        description: "Géolocalisation d'une adresse IP.",
+                        link: "https://geotracker.com"
+                    }
+                ]
+            },
+            {
+                name: "Outils divers",
+                tools: [
+                    {
+                        name: "DNS Lookup",
+                        description: "Effectue des recherches DNS.",
+                        link: "https://dnslookup.org"
+                    },
+                    {
+                        name: "ExifTool",
+                        description: "Outil pour lire, écrire et éditer les métadonnées des fichiers.",
+                        link: "https://exiftool.org"
+                    },
+                    {
+                        name: "Foca",
+                        description: "Outil de reconnaissance pour collecter des informations sur des cibles.",
+                        link: "https://www.elevenpaths.com/labstools/foca/index.html"
+                    },
+                    {
+                        name: "Google Dorks",
+                        description: "Utilisation avancée de Google pour trouver des informations.",
+                        link: "https://www.exploit-db.com/google-dorks"
+                    },
+                    {
+                        name: "SpiderFoot",
+                        description: "Outil d'automatisation d'OSINT.",
+                        link: "https://www.spiderfoot.net"
+                    },
+                    {
+                        name: "CheckUsernames",
+                        description: "Vérifiez la disponibilité des noms d'utilisateur sur plusieurs réseaux sociaux.",
+                        link: "https://checkusernames.com"
+                    }
+                ]
+            }
+        ];
+
+        // Fonction pour afficher les outils
+        function displayTools() {
+            const toolsContainer = document.getElementById('toolsContainer');
+            categories.forEach(category => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category';
+                
+                const categoryTitle = document.createElement('h2');
+                categoryTitle.innerText = category.name;
+                categoryDiv.appendChild(categoryTitle);
+                
+                const toolCardsContainer = document.createElement('div');
+                toolCardsContainer.className = 'toolsContainer'; // Ajouter un conteneur pour les cartes
+                category.tools.forEach(tool => {
+                    const card = document.createElement('div');
+                    card.className = 'tool-card';
+                    card.innerHTML = `
+                        <h3>${tool.name}</h3>
+                        <p>${tool.description}</p>
+                        <a href="${tool.link}" target="_blank">Accéder</a>
+                    `;
+                    toolCardsContainer.appendChild(card);
+                });
+
+                categoryDiv.appendChild(toolCardsContainer);
+                toolsContainer.appendChild(categoryDiv);
+            });
+        }
+
+        // Fonction de filtre pour la barre de recherche
+        function filterTools() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const categoryDivs = document.querySelectorAll('.category');
+
+            categoryDivs.forEach(categoryDiv => {
+                const toolCards = categoryDiv.querySelectorAll('.tool-card');
+                let hasVisibleCards = false;
+
+                toolCards.forEach(card => {
+                    const title = card.querySelector('h3').innerText.toLowerCase();
+                    if (title.includes(input)) {
+                        card.style.display = 'block';
+                        hasVisibleCards = true;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                // Afficher ou cacher la catégorie en fonction de la visibilité des cartes
+                if (hasVisibleCards) {
+                    categoryDiv.style.display = 'block';
+                } else {
+                    categoryDiv.style.display = 'none';
+                }
+            });
+        }
+
+// Afficher les outils au chargement de la page
+window.onload = displayTools;
+</script>
+<footer>
+    <p>&copy; 2024 Tous droits réservés | Créé par Kyz</p>
+</footer>
+</body>
+</html>
